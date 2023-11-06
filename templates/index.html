@@ -1,0 +1,77 @@
+<head>
+    <title>排行榜</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <h1>排行榜</h1>
+
+    <select id="game-version">
+        <option value="0">尤里</option>
+        <option value="1">原版</option>
+    </select>
+
+    <table class="rankings-table" id="rankings">
+        <tr>
+            <th>排名</th>
+            <th>国家</th>
+            <th>头像</th>
+            <th>用户名</th>
+            <th>军衔</th>
+            <th>MMR</th>
+            <th>场次</th>
+            <th>胜率%</th>
+        </tr>
+        {% include 'rankings_partial.html' %}
+
+    </table>
+    <!-- <button id="getMoreData">加载更多</button> -->
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    let currentPage = 2;
+    let isLoading = false;
+
+    function loadData() {
+        $.ajax(
+            {
+                url: '/getMoreData?page=' + currentPage,  // 当前URL
+                success: function (data) {
+                    $('#rankings').append(data);  // 添加新的排名到列表
+                    currentPage += 1;
+                },
+                complete: function () {
+                    isLoading = false;  // 请求完成后，设置标志变量为false
+                }
+            }
+        );
+    }
+
+    // 当用户选择一个新的游戏版本时，获取并显示对应版本的排行榜
+    $('#game-version').change(
+        function() 
+        {
+            let gameVersion = $(this).val();
+            console.log(gameVersion);
+            $('#rankings tr:not(:first)').remove();
+            $.ajax({
+                url: '/getGameVersion?gameVersion=' + gameVersion + '&page=' + 1,
+                success: function(data) {
+                    console.log("succ");
+                    currentPage = 1;  // 重置当前页数
+                    loadData();
+                }
+            });
+        });
+    
+    window.onscroll =
+        function (ev) {
+            console.log("Bottom of page");
+            if (!isLoading && (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2) {
+                isLoading = true;  // 设置标志变量为true，表示正在加载数据
+                // 当用户滚动到页面底部时，加载更多数据
+                loadData();
+            }
+        };
+</script>

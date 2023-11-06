@@ -1,0 +1,13 @@
+
+{% for ranking in rankings %}
+<tr>
+    <td>{{ ranking.userLevel.rank }}</td>
+    <td><img class="area-image" src="{{ ranking.areaImage }}" alt="areaImage"></td>
+    <td><img class="avatar" src="{{ ranking.avatar }}" alt="avatar"></td>
+    <td>{{ ranking.username }}</td>
+    <td>{{ ranking.userLevel.levelName }}{{ ranking.userLevel.secondLevel }}</td>
+    <td>{{ ranking.userLevel.mmr }}</td>
+    <td>{{ ranking.userLevel.total }}</td>
+    <td>{{ ((ranking.userLevel.victoryTotal / ranking.userLevel.total if ranking.userLevel.total else 0) * 100) | round(2) }}</td>
+</tr>
+{% endfor %}
