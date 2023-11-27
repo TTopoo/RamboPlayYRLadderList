@@ -50,27 +50,44 @@
 
     // 当用户选择一个新的游戏版本时，获取并显示对应版本的排行榜
     $('#game-version').change(
-        function() 
-        {
+        function () {
             let gameVersion = $(this).val();
             console.log(gameVersion);
             $('#rankings tr:not(:first)').remove();
             $.ajax({
                 url: '/getGameVersion?gameVersion=' + gameVersion + '&page=' + 1,
-                success: function(data) {
+                success: function (data) {
                     console.log("succ");
                     currentPage = 1;  // 重置当前页数
                     loadData();
                 }
             });
         });
-    
+
     window.onscroll =
         function (ev) {
-            console.log("Bottom of page");
+            console.log(window.innerHeight, window.pageYOffset, document.body.offsetHeight)
+            console.log((window.innerHeight + window.pageYOffset), document.body.offsetHeight)
             if (!isLoading && (window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 2) {
                 isLoading = true;  // 设置标志变量为true，表示正在加载数据
                 // 当用户滚动到页面底部时，加载更多数据
+                loadData();
+            }
+        };
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    window.onload =
+        async function () {
+            while (true) {
+                if (isLoading) {
+                    await sleep(300);
+                    continue;
+                }
+                if (document.body.offsetHeight > window.innerHeight)
+                    break;
+
+                isLoading = true;  // 设置标志变量为true，表示正在加载数据
                 loadData();
             }
         };
