@@ -5,6 +5,13 @@ from gevent import pywsgi
 app = Flask(__name__, static_folder='static')
 game_version = 0
 
+def getLadderApiInfo(seasonId, pageNum, version):
+    url = "https://api.ok-skins.com/battlecenter/qualifying/v1/rank?seasonId=" + str(seasonId) + "&pageNum=" + str(pageNum) + "&pageSize=15&startRank=0&version=" + str(version)
+    print(seasonId, pageNum, version)
+    response = requests.get(url)
+    data = response.json()
+    return data
+
 @app.route('/getGameVersion')
 def getGameVersion():
     global game_version
@@ -16,11 +23,11 @@ def getGameVersion():
 
 @app.route('/')
 def index():
-    url = "https://api.ok-skins.com/battlecenter/qualifying/v1/rank?seasonId=14&pageNum=1&pageSize=15&startRank=0&version=" + str(game_version)
-    response = requests.get(url)
-    data = response.json()
+    data = getLadderApiInfo(seasonId=14, pageNum=1, version=game_version)
     rankings = data["data"]["list"]
-    print(url)
+    data = getLadderApiInfo(seasonId=14, pageNum=2, version=game_version)
+    rankings += data["data"]["list"]
+    
     return render_template('index.html', rankings=rankings)
 
 @app.route('/getMoreData')
@@ -28,11 +35,11 @@ def getMoreData():
     # 获取更多的排名数据
     page = request.args.get('page', type=int, default=1)
     
-    url = "https://api.ok-skins.com/battlecenter/qualifying/v1/rank?seasonId=14&pageNum=" + str(page) + "&pageSize=15&startRank=0&version=" + str(game_version)
-    response = requests.get(url)
-    data = response.json()
+    data = getLadderApiInfo(seasonId=14, pageNum=page, version=game_version)
     rankings = data["data"]["list"]
-    print(url)
+    data = getLadderApiInfo(seasonId=14, pageNum=page+1, version=game_version)
+    rankings += data["data"]["list"]
+
     return render_template('rankings_partial.html', rankings=rankings)
 
 server = pywsgi.WSGIServer(('0.0.0.0', 5005), app)

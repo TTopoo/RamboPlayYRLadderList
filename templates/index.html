@@ -30,7 +30,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    let currentPage = 2;
+    let currentPage = 3;
     let isLoading = false;
 
     function loadData() {
@@ -39,7 +39,7 @@
                 url: '/getMoreData?page=' + currentPage,  // 当前URL
                 success: function (data) {
                     $('#rankings').append(data);  // 添加新的排名到列表
-                    currentPage += 1;
+                    currentPage += 2;
                 },
                 complete: function () {
                     isLoading = false;  // 请求完成后，设置标志变量为false
